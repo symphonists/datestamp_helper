@@ -31,7 +31,7 @@
 
 			$mtime = @filemtime(substr($matches[2], $this->workspacePosition));
 
-			return str_replace(':datestamp', ($mtime ? '?' . $mtime : NULL), $matches[0]);
+			return str_replace(':datestamp', ($mtime ? '?' . 't=' . $mtime : NULL), $matches[0]);
 		}
 
 		public function replaceParams(&$context){
