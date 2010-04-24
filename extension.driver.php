@@ -1,17 +1,16 @@
 <?php
 
-	Class extension_datestamp_helper extends Extension{
-
-		public $workspacePosition = NULL;
+	class extension_datestamp_helper extends Extension {
 
 		public function about(){
 			return array(
 				'name' => 'Datestamp Helper',
-				'version' => '1.0',
-				'release-date' => '2009-07-02',
+				'version' => '1.1',
+				'release-date' => '2010-04-24',
 				'author' => array(
 					'name' => 'Rainer Borene',
-					'email' => 'rainerborene@gmail.com',
+					'website' => 'http://rainerborene.com/',
+					'email' => 'me@rainerborene.com'
 				)
 			);		
 		}
@@ -20,21 +19,21 @@
 			return array(
 				array(
 					'page' => '/frontend/',
-					'delegate' => 'FrontendOutputPostGenerate',
-					'callback' => 'replaceParams'					
+					'delegate' => 'FrontendOutputPreGenerate',
+					'callback' => 'FrontendOutputPreGenerate'					
 				)
 			);
 		}
 
-		public function __replaceParam($matches) {
-			if (!$this->workspacePosition) $this->workspacePosition = strpos($matches[2], 'workspace');
-
-			$mtime = @filemtime(substr($matches[2], $this->workspacePosition));
-
-			return str_replace(':datestamp', ($mtime ? '?' . 't=' . $mtime : NULL), $matches[0]);
+		public function FrontendOutputPreGenerate($context){
+			Frontend::instance()->Page()->registerPHPFunction('mtime');
 		}
 
-		public function replaceParams(&$context){
-			$context['output'] = preg_replace_callback('/(\"|\')([^\"\']+):datestamp?(\"|\')/', array(&$this, '__replaceParam'), $context['output']);
-		}
+	}
+
+	// ---------------------------------------------------------------- //
+
+	function mtime($path){
+		$mtime = filemtime(WORKSPACE . '/' . $path);
+		return URL . '/workspace/' . $path . "?cache={$mtime}";
 	}
